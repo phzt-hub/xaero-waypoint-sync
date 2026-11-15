@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "waypointsync",
+	"version": "${version}",
+	"name": "Xaero Waypoint Sync",
+	"description": "服务器端的 waypoint 仓库：OP 用客户端命令把 Xaero 里当前世界的全部 waypoint 上传到服务器，任何装了本 mod 的玩家都能一键拉取到自己 Xaero 的「服务器同步」waypoint 集里。",
+	"authors": [
+		"phzt"
+	],
+	"contact": {
+		"homepage": "https://github.com/phzt-hub/xaero-waypoint-sync",
+		"issues": "https://github.com/phzt-hub/xaero-waypoint-sync/issues"
+	},
+	"license": "CC0-1.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.phzt.waypointsync.WaypointSync"
+		],
+		"client": [
+			"com.phzt.waypointsync.client.WaypointSyncClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"xaerominimap": ">=26.6.1",
+		"xaeroworldmap": ">=1.47.2"
+	}
+}
