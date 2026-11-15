@@ -33,6 +33,8 @@ dependencies {
 	// 之所以放在 libs/ 里而不是 maven：这两个 jar 不在公共 maven 上。
 	compileOnly files("libs/xaerominimap-fabric-26.3-26.6.2.jar")
 	compileOnly files("libs/xaerolib-fabric-26.3-1.8.5.jar")
+	// Mod Menu 也只在编译期引用：装了就有齿轮，没装就只剩 /wpsync config。
+	compileOnly files("libs/modmenu-21.0.1.jar")
 }
 
 processResources {

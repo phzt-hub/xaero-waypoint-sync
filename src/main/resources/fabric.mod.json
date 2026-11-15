@@ -12,6 +12,7 @@
 		"issues": "https://github.com/phzt-hub/xaero-waypoint-sync/issues"
 	},
 	"license": "CC0-1.0",
+	"icon": "assets/waypointsync/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -19,6 +20,9 @@
 		],
 		"client": [
 			"com.phzt.waypointsync.client.WaypointSyncClient"
+		],
+		"modmenu": [
+			"com.phzt.waypointsync.client.ModMenuIntegration"
 		]
 	},
 	"depends": {
@@ -26,6 +30,9 @@
 		"minecraft": "~26.3",
 		"java": ">=25",
 		"fabric-api": "*"
+	},
+	"recommends": {
+		"modmenu": ">=21.0.0"
 	},
 	"suggests": {
 		"xaerominimap": ">=26.6.1",

@@ -18,6 +18,9 @@ public final class ClientSync {
     private static final List<String> INCOMING = new ArrayList<>();
     private static int incomingTotal = -1;
     private static int autoPullCountdown = -1;
+    /** 最近一次操作的结果。设置页在界面里看不见聊天栏，就从这里再显示一遍。 */
+    private static String lastStatus = "还没有操作";
+    private static boolean lastStatusFailed = false;
 
     private ClientSync() {
     }
@@ -49,7 +52,8 @@ public final class ClientSync {
         for (int i = 0; i < chunks.size(); i++) {
             ClientPlayNetworking.send(new SyncPayloads.UploadPayload(session, i, chunks.size(), chunks.get(i)));
         }
-        feedback(source, ChatFormatting.GREEN, "已发送 " + records.size() + " 条 waypoint（" + chunks.size() + " 片），等服务端确认");
+        feedback(source, ChatFormatting.GREEN, "已发送 " + records.size() + " 条 waypoint（" + chunks.size()
+                + " 片），等服务端确认（回执看聊天栏）");
         WaypointSyncClient.LOGGER.info("上传 {} 条 waypoint, {} 片", records.size(), chunks.size());
     }
 
@@ -103,6 +107,27 @@ public final class ClientSync {
         }
     }
 
+    /** 最近一次操作的结果文案（给设置页用）。 */
+    public static String lastStatus() {
+        return lastStatus;
+    }
+
+    /** 最近一次操作是不是失败/被拒（设置页据此选红字还是绿字）。 */
+    public static boolean lastStatusFailed() {
+        return lastStatusFailed;
+    }
+
+    /** 设置页自己发提示（比如「再点一次确认」），走同一份状态记录。 */
+    static void setStatus(String text, boolean failed) {
+        lastStatus = text;
+        lastStatusFailed = failed;
+    }
+
+    /** 服务端是否装了本 mod 并完成握手（能走上传/拉取的通道）。 */
+    public static boolean serverAvailable() {
+        return canSend(SyncPayloads.RequestPayload.TYPE);
+    }
+
     public static void info(FabricClientCommandSource source) {
         Minecraft minecraft = Minecraft.getInstance();
         boolean inWorld = minecraft.player != null;
@@ -149,6 +174,7 @@ public final class ClientSync {
     }
 
     private static void feedback(FabricClientCommandSource source, ChatFormatting color, String text) {
+        setStatus(text, color == ChatFormatting.RED || color == ChatFormatting.YELLOW);
         if (source != null) {
             source.sendFeedback(Component.literal("[waypointsync] " + text).withStyle(color));
         } else {
@@ -157,6 +183,7 @@ public final class ClientSync {
     }
 
     private static void print(ChatFormatting color, String text) {
+        setStatus(text, color == ChatFormatting.RED || color == ChatFormatting.YELLOW);
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.gui != null && minecraft.gui.hud != null) {
             minecraft.gui.hud.getChat().addClientSystemMessage(

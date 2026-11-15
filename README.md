@@ -5,7 +5,9 @@
 - **OP** 在游戏里执行 `/wpsync upload`：把当前服务器**所有维度**的 Xaero waypoint 打包上传；
 - 服务端存一份（`<存档>/waypointsync/waypoints.json`），权限只有 OP；
 - **任何装了本 mod 的玩家** 执行 `/wpsync pull`，waypoint 会写进自己 Xaero 的「服务器同步」集里
-  （默认进服自动拉一次）。
+  （默认进服自动拉一次）；
+- 集名和自动拉取这些开关都在**设置页**里：装了 Mod Menu 就从 mods 列表点本 mod 的齿轮，
+  没装 Mod Menu 就 `/wpsync config`。
 
 本 mod 是双端 jar：服务端负责存储、权限、下发；客户端负责读写 Xaero。只装服务端也能启动，
 只是没人能上传/拉取。
@@ -18,6 +20,7 @@
 | Fabric Loader | 0.19.5 |
 | Fabric API | 0.162.0+26.3 |
 | 客户端前置 | Xaero's Minimap ≥ 26.6.1（waypoint 本体），Xaero's World Map 可选 |
+| 客户端可选 | Mod Menu ≥ 21.0.0（只为在 mods 列表里给出本 mod 的设置入口） |
 
 ## 命令
 
@@ -29,6 +32,7 @@
 | `/wpsync pull` | 请求服务端数据，写进本地「服务器同步」集 |
 | `/wpsync info` | 看 Xaero 是否在位、当前集名、本地可上传条数 |
 | `/wpsync clear` | 清掉本地「服务器同步」集 |
+| `/wpsync config` | 打开设置页（集名、进服自动拉取、三个动作按钮） |
 
 ### 服务端（`/wpsyncadmin`，需要 OP）
 
@@ -40,6 +44,32 @@
 | `/wpsyncadmin reload` | 重读磁盘上的仓库与 `config/waypointsync-server.json` |
 
 服务端命令故意不叫 `/wpsync`：单人游戏里同名命令会互相抢输入。
+
+## 设置界面
+
+装了 Mod Menu 时，mods 列表里本 mod 那一项长这样：选中它，点右上角的齿轮。
+
+![Mod Menu 里的入口](docs/modmenu.png)
+
+设置页本身：
+
+![设置页](docs/config-screen.png)
+
+| 控件 | 作用 |
+|---|---|
+| 同步集名称 | 拉取写进哪个集。不能含英文冒号（Xaero 用 `:` 分字段）、不能以 `gui.xaero` 开头（那是 Xaero 的内置集）、最多 32 字符；**改名不会自动删掉旧集** |
+| 进服自动拉取：开/关 | 进服务器两秒后自动拉一次，免得每次手动敲命令 |
+| 立即拉取 / 上传 / 清空同步集 | 三个命令的按钮版。上传仍由服务端校验 OP；清空要**连点两次**才执行，5 秒内不确认就自动复原 |
+| 完成 / 取消 | 完成才写 `config/waypointsync-client.json`；取消丢弃改动 |
+
+页面顶部一行是实时状态（Xaero 装了没、世界进了没、服务端握手了没），底部一行是最近一次操作的回执——
+界面打开时聊天栏是看不见的，所以回执在这里再显示一遍。
+
+入口有两个：装了 Mod Menu 就在 mods 列表里点本 mod 的齿轮（`fabric.mod.json` 的 `modmenu` entrypoint，
+Mod Menu 只在编译期依赖，没装也不影响启动）；没装 Mod Menu 就 `/wpsync config`。
+
+服务端那份配置没有界面（专用服务器上没有客户端屏），仍然是 `config/waypointsync-server.json`
+加 `/wpsyncadmin reload`。
 
 ## 配置
 
@@ -110,7 +140,7 @@ waypoint 存在客户端，服务端拿不到；Xaero 的文件格式也没有�
 ## 构建
 
 ```sh
-./tools/fetch-libs.sh   # 拉 Xaero 的 jar 到 libs/（许可原因不进仓库）
+./tools/fetch-libs.sh   # 拉 Xaero 与 Mod Menu 的 jar 到 libs/（许可原因不进仓库）
 ./gradlew25 build       # 不要直接用 ./gradlew，见 gradle.properties 注释
 ```
 
